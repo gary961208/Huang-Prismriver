@@ -1,17 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="./style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pen</title>
-  </head>
-  <body>
-
-    <script src="./script.js"></script>
-  </body>
-</html>
-<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -105,7 +92,7 @@
       min-height: 90px;
     }
 
-    /* --- 已解鎖按鈕 (前兩關) --- */
+    /* --- 已解鎖按鈕 --- */
     .btn-unlocked {
       background-color: #1a1a1a;
       color: #ffffff;
@@ -200,8 +187,7 @@
   <div class="container">
     <!-- 1. 大頭貼與個人資訊 -->
     <div class="profile-section">
-      <!-- 假圖片預設，後續可替換成自己的圖片路徑，例如：avatar.jpg -->
-      <img class="avatar" src="https://i.postimg.cc/Qx8FKJVf/avatar-jpg.jpg" alt="https://i.postimg.cc/Qx8FKJVf/avatar-jpg.jpg">
+      <img class="avatar" src="https://i.postimg.cc/Qx8FKJVf/avatar-jpg.jpg" alt="黃冠融的大頭貼">
       <h1 class="name">黃冠融</h1>
       <p class="subtitle">網頁程式設計 | 作品集闖關地圖</p>
     </div>
@@ -221,12 +207,13 @@
         <span>今天吃甚麼?</span>
       </a>
 
-      <!-- Week 3 ~ 16 (未解鎖狀態) -->
-      <div class="btn btn-locked">
-        <span class="lock-icon">🔒</span>
-        <span>Week 3 - 尚未解鎖</span>
-      </div>
+      <!-- Week 3 (已解鎖 - 迷因產生器) -->
+      <a href="#" class="btn btn-unlocked">
+        <span class="badge">Week 03</span>
+        <span>迷因產生器</span>
+      </a>
 
+      <!-- Week 4 ~ 16 (未解鎖狀態) -->
       <div class="btn btn-locked">
         <span class="lock-icon">🔒</span>
         <span>Week 4 - 尚未解鎖</span>
