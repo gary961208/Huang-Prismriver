@@ -1,381 +1,286 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="./style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pen</title>
-  </head>
-  <body>
-
-    <script src="./script.js"></script>
-  </body>
-</html>
-<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>極簡風迷因產生器</title>
-    <!-- 引入 Google Fonts: Noto Sans TC (思源黑體) -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- 引入 html2canvas CDN 用於截圖下載 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <style>
-        /* === 全局黑白極簡風樣式 === *//* === Global Black & White Minimalist Style === */
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #111111;
-            --border-color: #111111;
-            --panel-bg: #f9f9f9;
-            --radius: 0px; /* 極簡風通常不使用圓角或僅使用極少圓角 */
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的網頁作品集 | Portfolio</title>
+  <style>
+    /* --- 全局設定 --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #0d0d0d;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
 
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
+    /* 入口主容器 */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
 
-        header {
-            margin-bottom: 30px;
-            text-align: center;
-        }
+    /* --- 1. 個人頭像與資訊 --- */
+    .profile-section {
+      margin-bottom: 40px;
+    }
 
-        h1 {
-            font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-        }
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      object-fit: cover;
+      margin-bottom: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
 
-        /* === 主體排版：響應式雙欄佈局 (RWD Layout) === *//* === Main Layout: Responsive Two Columns === */
-        .container {
-            display: flex;
-            gap: 30px;
-            width: 100%;
-            max-width: 1100px;
-            align-items: flex-start;
-        }
+    .avatar:hover {
+      transform: scale(1.05) rotate(3deg);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    }
 
-        /* 控制面板區 */
-        .control-panel {
-            flex: 1;
-            background: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    .name {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
 
-        /* 迷因即時預覽區 */
-        .preview-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
+    .subtitle {
+      font-size: 0.95rem;
+      color: #888888;
+      letter-spacing: 1px;
+    }
 
-        /* 表單控制元件樣式 */
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+    /* --- 2. 16 個按鈕網格佈局 --- */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* 電腦版 1 列 4 個 */
+      gap: 16px;
+      width: 100%;
+    }
 
-        label {
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+    /* 通用按鈕樣式 */
+    .btn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 15px;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      overflow: hidden;
+      min-height: 90px;
+    }
 
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid var(--border-color);
-            background: #ffffff;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text-color);
-            outline: none;
-        }
+    /* --- 已解鎖按鈕 --- */
+    .btn-unlocked {
+      background-color: #1a1a1a;
+      color: #ffffff;
+      border: 1px solid #333333;
+    }
 
-        input[type="text"]:focus {
-            background: #fff;
-            border-color: #000;
-            box-shadow: 2px 2px 0px #000;
-        }
+    /* 酷炫微光懸停效果 (Hover Animation) */
+    .btn-unlocked::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+      );
+      transition: left 0.6s ease;
+    }
 
-        input[type="range"] {
-            width: 100%;
-            accent-color: #111;
-            cursor: pointer;
-        }
+    .btn-unlocked:hover {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+    }
 
-        /* === 迷因畫布外框 === *//* === Meme Canvas Box === */
-        #meme-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            aspect-ratio: 1 / 1; /* 預設正方形比例 */
-            background-color: #eee;
-            border: 2px solid var(--border-color);
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .btn-unlocked:hover::before {
+      left: 100%;
+    }
 
-        #meme-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* 確保圖片填滿容器 */
-            display: block;
-        }
+    .btn-unlocked .badge {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.6;
+      margin-bottom: 4px;
+    }
 
-        .placeholder-text {
-            position: absolute;
-            color: #888;
-            font-weight: 700;
-            pointer-events: none;
-        }
+    /* --- 未解鎖按鈕 (鎖定狀態) --- */
+    .btn-locked {
+      background-color: #121212;
+      color: #444444;
+      border: 1px dashed #282828;
+      cursor: not-allowed;
+      user-select: none;
+    }
 
-        /* === 迷因文字樣式（黑白粗體 + 強力黑色文字陰影） === *//* === Meme Text Style === */
-        .meme-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            text-align: center;
-            font-weight: 900;
-            color: #ffffff;
-            text-transform: uppercase;
-            /* 讓文字在任何圖片上都清晰可見的粗黑色邊框效果 */
-            text-shadow: 
-                -3px -3px 0 #000,  
-                 3px -3px 0 #000,
-                -3px  3px 0 #000,
-                 3px  3px 0 #000,
-                 0px 4px 10px rgba(0,0,0,0.8);
-            pointer-events: none;
-            word-break: break-word;
-            line-height: 1.2;
-        }
+    .btn-locked .lock-icon {
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+      filter: grayscale(100%);
+      opacity: 0.5;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
 
-        #top-text {
-            top: 10%; /* 透過 JavaScript 滑桿動態修改 */
-        }
+    .btn-locked:hover {
+      border-color: #444444;
+      background-color: #161616;
+    }
 
-        #bottom-text {
-            bottom: 10%; /* 透過 JavaScript 滑桿動態修改 */
-        }
+    .btn-locked:hover .lock-icon {
+      transform: scale(1.2) rotate(-10deg);
+      opacity: 0.8;
+    }
 
-        /* === 下載按鈕樣式 === *//* === Download Button Style === */
-        .btn-download {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--text-color);
-            color: var(--bg-color);
-            border: 2px solid var(--border-color);
-            font-family: inherit;
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.1s ease;
-        }
+    /* --- 響應式手機版設計 (RWD) --- */
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr); /* 平板/大手機版 1 列 2 個 */
+        gap: 12px;
+      }
+    }
 
-        .btn-download:hover {
-            background-color: #ffffff;
-            color: var(--text-color);
-            box-shadow: 3px 3px 0px #111;
-            transform: translate(-2px, -2px);
-        }
-
-        .btn-download:active {
-            transform: translate(0, 0);
-            box-shadow: none;
-        }
-
-        /* === 手機版響應式調整 (RWD Media Query) === *//* === Mobile Responsive Layout === */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            body {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+    @media (max-width: 480px) {
+      .grid-container {
+        grid-template-columns: repeat(1, 1fr); /* 直立手機版 1 列 1 個 */
+      }
+      
+      .name {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>Meme Generator</h1>
-    </header>
-
-    <div class="container">
-        <!-- 左側：控制面板區 -->
-        <div class="control-panel">
-            <!-- 1. 圖片上傳 -->
-            <div class="control-group">
-                <label for="image-input">1. 選擇底圖</label>
-                <input type="file" id="image-input" accept="image/*">
-            </div>
-
-            <!-- 2. 上方文字輸入 -->
-            <div class="control-group">
-                <label for="top-text-input">2. 上方文字</label>
-                <input type="text" id="top-text-input" placeholder="輸入上方文字...">
-            </div>
-
-            <!-- 上方文字垂直位置滑桿 -->
-            <div class="control-group">
-                <label for="top-pos-range">上方文字位置 (垂直)</label>
-                <input type="range" id="top-pos-range" min="2" max="85" value="10">
-            </div>
-
-            <!-- 3. 下方文字輸入 -->
-            <div class="control-group">
-                <label for="bottom-text-input">3. 下方文字</label>
-                <input type="text" id="bottom-text-input" placeholder="輸入下方文字...">
-            </div>
-
-            <!-- 下方文字垂直位置滑桿 -->
-            <div class="control-group">
-                <label for="bottom-pos-range">下方文字位置 (垂直)</label>
-                <input type="range" id="bottom-pos-range" min="5" max="90" value="80">
-            </div>
-
-            <!-- 4. 字體大小滑桿 -->
-            <div class="control-group">
-                <label for="font-size-range">字體大小</label>
-                <input type="range" id="font-size-range" min="16" max="64" value="32">
-            </div>
-
-            <!-- 5. 一鍵下載按鈕 -->
-            <button class="btn-download" id="download-btn">下載迷因 (PNG)</button>
-        </div>
-
-        <!-- 右側：迷因即時預覽區 -->
-        <div class="preview-area">
-            <div id="meme-container">
-                <span class="placeholder-text" id="placeholder">請選擇圖片...</span>
-                <img id="meme-image" src="" alt="" style="display: none;">
-                <div class="meme-text" id="top-text"></div>
-                <div class="meme-text" id="bottom-text"></div>
-            </div>
-        </div>
+  <div class="container">
+    <!-- 1. 大頭貼與個人資訊 -->
+    <div class="profile-section">
+      <img class="avatar" src="https://i.postimg.cc/Qx8FKJVf/avatar-jpg.jpg" alt="黃冠融的大頭貼">
+      <h1 class="name">黃冠融</h1>
+      <p class="subtitle">網頁程式設計 | 作品集闖關地圖</p>
     </div>
 
-    <script>
-        // 取得 DOM 元素
-        const imageInput = document.getElementById('image-input');
-        const memeImage = document.getElementById('meme-image');
-        const placeholder = document.getElementById('placeholder');
-        
-        const topTextInput = document.getElementById('top-text-input');
-        const bottomTextInput = document.getElementById('bottom-text-input');
-        
-        const topTextDisplay = document.getElementById('top-text');
-        const bottomTextDisplay = document.getElementById('bottom-text');
-        
-        const fontSizeRange = document.getElementById('font-size-range');
-        const topPosRange = document.getElementById('top-pos-range');
-        const bottomPosRange = document.getElementById('bottom-pos-range');
-        
-        const downloadBtn = document.getElementById('download-btn');
-        const memeContainer = document.getElementById('meme-container');
+    <!-- 2. 16 個關卡按鈕區塊 -->
+    <div class="grid-container">
+      
+      <!-- Week 1 (已解鎖) -->
+      <a href="https://es-d-69857747620261007-01a10b02-9246-77a0-a6b8-f54dd360c295.codepen.dev/" class="btn btn-unlocked">
+        <span class="badge">Week 01</span>
+        <span>數位名片</span>
+      </a>
 
-        // 1. 處理本機圖片上傳與預覽 (使用 FileReader 避開 CORS 限制)
-        imageInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    memeImage.src = e.target.result;
-                    memeImage.style.display = 'block';
-                    placeholder.style.display = 'none'; // 隱藏提示文字
-                }
-                reader.readAsDataURL(file); // 讀取圖片為 DataURL
-            }
-        });
+      <!-- Week 2 (已解鎖) -->
+      <a href="https://es-d-69857747620261007-01a10b14-8a94-7b8e-ad8d-e96501419372.codepen.dev" class="btn btn-unlocked">
+        <span class="badge">Week 02</span>
+        <span>今天吃甚麼?</span>
+      </a>
 
-        // 2. 即時更新「上方文字」
-        topTextInput.addEventListener('input', function() {
-            topTextDisplay.textContent = this.value;
-        });
+      <!-- Week 3 (已解鎖 - 迷因產生器) -->
+      <a href="#" class="btn btn-unlocked">
+        <span class="badge">Week 03</span>
+        <span>迷因產生器</span>
+      </a>
 
-        // 3. 即時更新「下方文字」
-        bottomTextInput.addEventListener('input', function() {
-            bottomTextDisplay.textContent = this.value;
-        });
+      <!-- Week 4 ~ 16 (未解鎖狀態) -->
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 4 - 尚未解鎖</span>
+      </div>
 
-        // 4. 即時調整「字體大小」
-        fontSizeRange.addEventListener('input', function() {
-            const size = this.value + 'px';
-            topTextDisplay.style.fontSize = size;
-            bottomTextDisplay.style.fontSize = size;
-        });
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 5 - 尚未解鎖</span>
+      </div>
 
-        // 5. 即時微調「上方文字垂直位置」
-        topPosRange.addEventListener('input', function() {
-            topTextDisplay.style.top = this.value + '%';
-            topTextDisplay.style.bottom = 'auto'; // 解除底部限制
-        });
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 6 - 尚未解鎖</span>
+      </div>
 
-        // 6. 即時微調「下方文字垂直位置」
-        bottomPosRange.addEventListener('input', function() {
-            bottomTextDisplay.style.bottom = (100 - this.value) + '%';
-            bottomTextDisplay.style.top = 'auto'; // 解除頂部限制
-        });
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 7 - 尚未解鎖</span>
+      </div>
 
-        // 7. 一鍵下載圖檔 (使用 html2canvas)
-        downloadBtn.addEventListener('click', function() {
-            // 檢查是否有上傳圖片
-            if (memeImage.style.display === 'none') {
-                alert('請先上傳一張圖片作為迷因底圖！');
-                return;
-            }
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 8 - 尚未解鎖</span>
+      </div>
 
-            // 使用 html2canvas 套件截取迷因容器
-            html2canvas(memeContainer, {
-                useCORS: true, // 允許載入跨域圖片（本地圖片搭配 FileReader 安全無虞）
-                scale: 2       // 提高匯出圖片的解析度（Retina 級清晰度）
-            }).then(canvas => {
-                // 建立一個隱藏的下載連結
-                const link = document.createElement('a');
-                link.download = 'my-meme.png'; // 設定下載檔名
-                link.href = canvas.toDataURL('image/png'); // 將 canvas 轉成圖片格式
-                link.click(); // 模擬點擊下載
-            }).catch(error => {
-                console.error('截圖失敗：', error);
-                alert('下載發生錯誤，請稍後再試！');
-            });
-        });
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 9 - 尚未解鎖</span>
+      </div>
 
-        // 初始化套用一次預設字體大小
-        topTextDisplay.style.fontSize = fontSizeRange.value + 'px';
-        bottomTextDisplay.style.fontSize = fontSizeRange.value + 'px';
-    </script>
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 10 - 尚未解鎖</span>
+      </div>
+
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 11 - 尚未解鎖</span>
+      </div>
+
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 12 - 尚未解鎖</span>
+      </div>
+
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 13 - 尚未解鎖</span>
+      </div>
+
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 14 - 尚未解鎖</span>
+      </div>
+
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 15 - 尚未解鎖</span>
+      </div>
+
+      <div class="btn btn-locked">
+        <span class="lock-icon">🔒</span>
+        <span>Week 16 - 尚未解鎖</span>
+      </div>
+
+    </div>
+  </div>
+
 </body>
 </html>
