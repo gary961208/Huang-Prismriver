@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pen</title>
+  </head>
+  <body>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極簡風迷因產生器</title>
+    <!-- 引入 Google Fonts: Noto Sans TC (思源黑體) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- 引入 html2canvas CDN 用於截圖下載 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* === 全局黑白極簡風樣式 === *//* === Global Black & White Minimalist Style === */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #111111;
+            --border-color: #111111;
+            --panel-bg: #f9f9f9;
+            --radius: 0px; /* 極簡風通常不使用圓角或僅使用極少圓角 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* === 主體排版：響應式雙欄佈局 (RWD Layout) === *//* === Main Layout: Responsive Two Columns === */
+        .container {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+            align-items: flex-start;
+        }
+
+        /* 控制面板區 */
+        .control-panel {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 迷因即時預覽區 */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* 表單控制元件樣式 */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: #ffffff;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-color);
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            background: #fff;
+            border-color: #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #111;
+            cursor: pointer;
+        }
+
+        /* === 迷因畫布外框 === *//* === Meme Canvas Box === */
+        #meme-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1 / 1; /* 預設正方形比例 */
+            background-color: #eee;
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #meme-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 確保圖片填滿容器 */
+            display: block;
+        }
+
+        .placeholder-text {
+            position: absolute;
+            color: #888;
+            font-weight: 700;
+            pointer-events: none;
+        }
+
+        /* === 迷因文字樣式（黑白粗體 + 強力黑色文字陰影） === *//* === Meme Text Style === */
+        .meme-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            text-align: center;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            /* 讓文字在任何圖片上都清晰可見的粗黑色邊框效果 */
+            text-shadow: 
+                -3px -3px 0 #000,  
+                 3px -3px 0 #000,
+                -3px  3px 0 #000,
+                 3px  3px 0 #000,
+                 0px 4px 10px rgba(0,0,0,0.8);
+            pointer-events: none;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        #top-text {
+            top: 10%; /* 透過 JavaScript 滑桿動態修改 */
+        }
+
+        #bottom-text {
+            bottom: 10%; /* 透過 JavaScript 滑桿動態修改 */
+        }
+
+        /* === 下載按鈕樣式 === *//* === Download Button Style === */
+        .btn-download {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .btn-download:hover {
+            background-color: #ffffff;
+            color: var(--text-color);
+            box-shadow: 3px 3px 0px #111;
+            transform: translate(-2px, -2px);
+        }
+
+        .btn-download:active {
+            transform: translate(0, 0);
+            box-shadow: none;
+        }
+
+        /* === 手機版響應式調整 (RWD Media Query) === *//* === Mobile Responsive Layout === */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Meme Generator</h1>
+    </header>
+
+    <div class="container">
+        <!-- 左側：控制面板區 -->
+        <div class="control-panel">
+            <!-- 1. 圖片上傳 -->
+            <div class="control-group">
+                <label for="image-input">1. 選擇底圖</label>
+                <input type="file" id="image-input" accept="image/*">
+            </div>
+
+            <!-- 2. 上方文字輸入 -->
+            <div class="control-group">
+                <label for="top-text-input">2. 上方文字</label>
+                <input type="text" id="top-text-input" placeholder="輸入上方文字...">
+            </div>
+
+            <!-- 上方文字垂直位置滑桿 -->
+            <div class="control-group">
+                <label for="top-pos-range">上方文字位置 (垂直)</label>
+                <input type="range" id="top-pos-range" min="2" max="85" value="10">
+            </div>
+
+            <!-- 3. 下方文字輸入 -->
+            <div class="control-group">
+                <label for="bottom-text-input">3. 下方文字</label>
+                <input type="text" id="bottom-text-input" placeholder="輸入下方文字...">
+            </div>
+
+            <!-- 下方文字垂直位置滑桿 -->
+            <div class="control-group">
+                <label for="bottom-pos-range">下方文字位置 (垂直)</label>
+                <input type="range" id="bottom-pos-range" min="5" max="90" value="80">
+            </div>
+
+            <!-- 4. 字體大小滑桿 -->
+            <div class="control-group">
+                <label for="font-size-range">字體大小</label>
+                <input type="range" id="font-size-range" min="16" max="64" value="32">
+            </div>
+
+            <!-- 5. 一鍵下載按鈕 -->
+            <button class="btn-download" id="download-btn">下載迷因 (PNG)</button>
+        </div>
+
+        <!-- 右側：迷因即時預覽區 -->
+        <div class="preview-area">
+            <div id="meme-container">
+                <span class="placeholder-text" id="placeholder">請選擇圖片...</span>
+                <img id="meme-image" src="" alt="" style="display: none;">
+                <div class="meme-text" id="top-text"></div>
+                <div class="meme-text" id="bottom-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 取得 DOM 元素
+        const imageInput = document.getElementById('image-input');
+        const memeImage = document.getElementById('meme-image');
+        const placeholder = document.getElementById('placeholder');
+        
+        const topTextInput = document.getElementById('top-text-input');
+        const bottomTextInput = document.getElementById('bottom-text-input');
+        
+        const topTextDisplay = document.getElementById('top-text');
+        const bottomTextDisplay = document.getElementById('bottom-text');
+        
+        const fontSizeRange = document.getElementById('font-size-range');
+        const topPosRange = document.getElementById('top-pos-range');
+        const bottomPosRange = document.getElementById('bottom-pos-range');
+        
+        const downloadBtn = document.getElementById('download-btn');
+        const memeContainer = document.getElementById('meme-container');
+
+        // 1. 處理本機圖片上傳與預覽 (使用 FileReader 避開 CORS 限制)
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    memeImage.src = e.target.result;
+                    memeImage.style.display = 'block';
+                    placeholder.style.display = 'none'; // 隱藏提示文字
+                }
+                reader.readAsDataURL(file); // 讀取圖片為 DataURL
+            }
+        });
+
+        // 2. 即時更新「上方文字」
+        topTextInput.addEventListener('input', function() {
+            topTextDisplay.textContent = this.value;
+        });
+
+        // 3. 即時更新「下方文字」
+        bottomTextInput.addEventListener('input', function() {
+            bottomTextDisplay.textContent = this.value;
+        });
+
+        // 4. 即時調整「字體大小」
+        fontSizeRange.addEventListener('input', function() {
+            const size = this.value + 'px';
+            topTextDisplay.style.fontSize = size;
+            bottomTextDisplay.style.fontSize = size;
+        });
+
+        // 5. 即時微調「上方文字垂直位置」
+        topPosRange.addEventListener('input', function() {
+            topTextDisplay.style.top = this.value + '%';
+            topTextDisplay.style.bottom = 'auto'; // 解除底部限制
+        });
+
+        // 6. 即時微調「下方文字垂直位置」
+        bottomPosRange.addEventListener('input', function() {
+            bottomTextDisplay.style.bottom = (100 - this.value) + '%';
+            bottomTextDisplay.style.top = 'auto'; // 解除頂部限制
+        });
+
+        // 7. 一鍵下載圖檔 (使用 html2canvas)
+        downloadBtn.addEventListener('click', function() {
+            // 檢查是否有上傳圖片
+            if (memeImage.style.display === 'none') {
+                alert('請先上傳一張圖片作為迷因底圖！');
+                return;
+            }
+
+            // 使用 html2canvas 套件截取迷因容器
+            html2canvas(memeContainer, {
+                useCORS: true, // 允許載入跨域圖片（本地圖片搭配 FileReader 安全無虞）
+                scale: 2       // 提高匯出圖片的解析度（Retina 級清晰度）
+            }).then(canvas => {
+                // 建立一個隱藏的下載連結
+                const link = document.createElement('a');
+                link.download = 'my-meme.png'; // 設定下載檔名
+                link.href = canvas.toDataURL('image/png'); // 將 canvas 轉成圖片格式
+                link.click(); // 模擬點擊下載
+            }).catch(error => {
+                console.error('截圖失敗：', error);
+                alert('下載發生錯誤，請稍後再試！');
+            });
+        });
+
+        // 初始化套用一次預設字體大小
+        topTextDisplay.style.fontSize = fontSizeRange.value + 'px';
+        bottomTextDisplay.style.fontSize = fontSizeRange.value + 'px';
+    </script>
+</body>
+</html>
